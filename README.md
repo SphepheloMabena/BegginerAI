@@ -13,6 +13,7 @@
 
 - To build a docker image, run `docker build -t beginner-ai .`
 - To run the docker image, run `docker run -p 8000:8000 beginner-ai`
+- To list all running docker containers run `docker ps`
 - To stop all running docker containers, run `docker stop $(docker ps -aq)`
 
 
