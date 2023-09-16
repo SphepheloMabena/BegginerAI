@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import json
 
 # Load environment variables from .env file
 env_path = Path('beginneraichat') / '.env'
@@ -13,13 +14,10 @@ def get_prices(fuel_type):
     """"Returns the current petrol and diesel prices in South Africa"""
 
     diesel_prices_url = "https://www.globalpetrolprices.com/South-Africa/diesel_prices/"
-    prices_prices_url = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
-    diesel_prices_url = "https://www.globalpetrolprices.com/South-Africa/diesel_prices/"
-    prices_prices_url = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
+    petrol_prices_url = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
 
     if fuel_type == "petrol":
-        PRICES_PAGE = requests.get(prices_prices_url)
-        PRICES_PAGE = requests.get(prices_prices_url)
+        PRICES_PAGE = requests.get(petrol_prices_url)
     else:
         PRICES_PAGE = requests.get(diesel_prices_url)
 
@@ -84,6 +82,43 @@ def get_car_info():
     return car_make, car_year, car_model
 
 
+def scrape_historical_fuel_prices():
+    """Scrapes historical fuel prices from the sapia website"""	
+
+    base_url = "https://www.sapia.org.za/old-fuel-prices/"
+    years = list(range(2012, 2023))  # Years from 2012 to 2022
+    
+    fuel_data = {} 
+
+    for year in years:
+        url = f"{base_url}#tablepress-{year}"
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, "html.parser")
+        table = soup.find("table", class_=f"tablepress-id-{year}")
+
+        if table:
+            rows = table.find_all("tr")
+            header = [header.text.strip() for header in rows[0].find_all("th")]
+
+            year_data = []
+
+            for row in rows[1:]:
+                cells = [cell.text.strip() for cell in row.find_all("td")]
+                entry = dict(zip(header, cells))
+                year_data.append(entry)
+
+            # Filter out "COASTAL" and "GAUTENG" data
+            filtered_data = [entry for entry in year_data if
+                             entry.get(f"YR{year}") not in ("COASTAL", "") and
+                             entry.get(f"YR{year}") not in ("GAUTENG", "")]
+            
+            fuel_data[str(year)] = filtered_data
+    
+    # Save the data to a JSON file
+    with open("fuel_prices.json", "w") as json_file:
+        json.dump(fuel_data, json_file, indent=4)    
+    
+
 def chat():
     """Chat with the user"""
     while True:
@@ -118,4 +153,4 @@ def chat():
 
 
 if __name__ == "__main__":
-    chat()
+    scrape_historical_fuel_prices()
