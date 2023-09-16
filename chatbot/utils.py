@@ -10,6 +10,7 @@ load_dotenv(dotenv_path=env_path)
 
 
 
+
 def get_prices(fuel_type):
     """"Returns the current petrol and diesel prices in South Africa"""
 
@@ -21,12 +22,10 @@ def get_prices(fuel_type):
     else:
         PRICES_PAGE = requests.get(DIESEL_PRICES_URL)
 
-
     soup = BeautifulSoup(PRICES_PAGE.content, "html.parser")
     results = soup.find(id="graphPageLeft")
 
     job_elements = results.find_all("table")
-
 
     for job_element in job_elements:
         table_body_element = job_element.find("tbody")
