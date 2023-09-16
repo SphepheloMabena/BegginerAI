@@ -9,17 +9,16 @@ env_path = Path('beginneraichat') / '.env'
 load_dotenv(dotenv_path=env_path)
 
 
-
 def get_prices(fuel_type):
     """"Returns the current petrol and diesel prices in South Africa"""
 
-    DIESEL_PRICES_URL = "https://www.globalpetrolprices.com/South-Africa/diesel_prices/"
-    PETROL_PRICES_URL = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
+    diesel_prices_url = "https://www.globalpetrolprices.com/South-Africa/diesel_prices/"
+    prices_prices_url = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
 
     if fuel_type == "petrol":
-        PRICES_PAGE = requests.get(PETROL_PRICES_URL)
+        PRICES_PAGE = requests.get(prices_prices_url)
     else:
-        PRICES_PAGE = requests.get(DIESEL_PRICES_URL)
+        PRICES_PAGE = requests.get(diesel_prices_url)
 
 
     soup = BeautifulSoup(PRICES_PAGE.content, "html.parser")
@@ -59,3 +58,12 @@ def get_car_fuel_consumption(car_data):
     """Returns the fuel consumption of a car in litres per 100km"""	
     return car_data[0]["fuel_Consumtion_Combo"]
 
+
+def calculate_litres_used(distance, fuel_consumption):
+    """Returns the litres of fuel used for a given distance"""
+    return (distance / 100) * fuel_consumption
+
+
+def calculate_fuel_price(litres, price_per_litre):
+    """Returns the price of fuel for a given number of litres"""
+    return litres * price_per_litre
