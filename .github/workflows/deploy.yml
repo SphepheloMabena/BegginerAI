@@ -1,4 +1,4 @@
-name: Build and Deploy Docker image
+name: Build and Deploy Docker image with PostgreSQL
 
 on:
   push:
@@ -9,6 +9,17 @@ jobs:
   deployment:
     runs-on: ubuntu-22.04
     environment: production
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: your_database_name
+          POSTGRES_USER: your_database_user
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -U your_database_user" --health-interval 10s --health-timeout 5s --health-retries 3
 
     steps:
       - name: Checkout code
@@ -37,4 +48,4 @@ jobs:
             docker pull ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
             docker stop beginnerai || true
             docker rm beginnerai || true
-            docker run -d --name beginnerai -p 8000:8000 ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
+            docker run -d --name beginnerai -p 8000:8000 --link postgres beginnerai:${{ github.sha }}
