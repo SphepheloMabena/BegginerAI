@@ -30,14 +30,11 @@ jobs:
       - name: SSH into ECS instance
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.ECS_HOST }}
+          host: ${{ secrets.ECS_IP }}
           username: root
-          key: ${{ secrets.ECS_KEY }}
-          port: ${{ secrets.ECS_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
             docker stop beginnerai || true
             docker rm beginnerai || true
-            docker rmi ${{ secrets.ACR_REGISTRY }}/beginnerai:latest || true
-            docker tag ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }} ${{ secrets.ACR_REGISTRY }}/beginnerai:latest
-            docker run -d --restart=always --name beginnerai -p 8000:8000 ${{ secrets.ACR_REGISTRY }}/beginnerai:latest
+            docker run -d --name beginnerai -p 8000:8000 ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
