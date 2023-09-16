@@ -3,3 +3,4 @@ Django==4.2.5
 sqlparse==0.4.4
 requests==2.31.0
 beautifulsoup4==4.12.2
+python-dotenv==0.18.0
