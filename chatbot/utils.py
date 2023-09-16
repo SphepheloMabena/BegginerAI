@@ -163,4 +163,4 @@ def chat():
 
 
 if __name__ == "__main__":
-    scrape_historical_fuel_prices()
+    chat()
