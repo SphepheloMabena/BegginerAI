@@ -20,6 +20,16 @@ class HomeView(View):
         return render(request, 'index.html', context)
 
 
+class RegisterView(View):
+    def get(self, request):
+        return render(request, 'register.html')
+
+
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'login.html')
+
+
 class SaveFuelPriceView(View):
 
     def get(self, request, fuel_type):
