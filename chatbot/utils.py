@@ -14,8 +14,11 @@ def get_prices(fuel_type):
 
     diesel_prices_url = "https://www.globalpetrolprices.com/South-Africa/diesel_prices/"
     prices_prices_url = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
+    diesel_prices_url = "https://www.globalpetrolprices.com/South-Africa/diesel_prices/"
+    prices_prices_url = "https://www.globalpetrolprices.com/South-Africa/gasoline_prices/"
 
     if fuel_type == "petrol":
+        PRICES_PAGE = requests.get(prices_prices_url)
         PRICES_PAGE = requests.get(prices_prices_url)
     else:
         PRICES_PAGE = requests.get(diesel_prices_url)
@@ -25,7 +28,6 @@ def get_prices(fuel_type):
     results = soup.find(id="graphPageLeft")
 
     job_elements = results.find_all("table")
-
 
     for job_element in job_elements:
         table_body_element = job_element.find("tbody")
@@ -59,6 +61,14 @@ def get_car_fuel_consumption(car_data):
     return car_data[0]["fuel_Consumtion_Combo"]
 
 
+def calculate_litres_used(distance, fuel_consumption):
+    """Returns the litres of fuel used for a given distance"""
+    return (distance / 100) * fuel_consumption
+
+
+def calculate_price(litres, price_per_litre):
+    """Returns the price of fuel for a given number of litres"""
+    return litres * price_per_litre
 def calculate_litres_used(distance, fuel_consumption):
     """Returns the litres of fuel used for a given distance"""
     return (distance / 100) * fuel_consumption
