@@ -20,12 +20,10 @@ def get_prices(fuel_type):
     else:
         PRICES_PAGE = requests.get(diesel_prices_url)
 
-
     soup = BeautifulSoup(PRICES_PAGE.content, "html.parser")
     results = soup.find(id="graphPageLeft")
 
     job_elements = results.find_all("table")
-
 
     for job_element in job_elements:
         table_body_element = job_element.find("tbody")
