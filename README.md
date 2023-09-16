@@ -17,6 +17,6 @@
 
 
 ### How to ssh into the Alibaba VM instance
-Run the following command: `ssh ssh@47.88.4.32`
+Run the following command: `ssh root@47.88.4.32`
   
 Then you're all sorted :):+1:
