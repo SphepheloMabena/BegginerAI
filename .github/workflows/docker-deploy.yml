@@ -1,0 +1,43 @@
+name: Build and Deploy Docker image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deployment:
+    runs-on: ubuntu-22.04
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Alibaba Cloud Container Registry
+        uses: aliyun/acr-login@v1
+        with:
+          region-id: ${{ secrets.ACR_REGION }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Build and push Docker image
+        run: |
+            docker build -t beginnerai .
+            docker tag beginnerai ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
+            docker push ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
+
+      - name: SSH into ECS instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: root
+          key: ${{ secrets.ECS_KEY }}
+          port: ${{ secrets.ECS_PORT }}
+          script: |
+            docker pull ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }}
+            docker stop beginnerai || true
+            docker rm beginnerai || true
+            docker rmi ${{ secrets.ACR_REGISTRY }}/beginnerai:latest || true
+            docker tag ${{ secrets.ACR_REGISTRY }}/beginnerai:${{ github.sha }} ${{ secrets.ACR_REGISTRY }}/beginnerai:latest
+            docker run -d --restart=always --name beginnerai -p 8000:8000 ${{ secrets.ACR_REGISTRY }}/beginnerai:latest
