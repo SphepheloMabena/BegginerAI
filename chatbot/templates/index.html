@@ -1,11 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <div class="home-body">
+        <div class="greeting-card">
+            <h1 class="heading">FuelWise</h1>
 
-    <h1>Home</h1>
-    <p> Welcome to the home page</p>
+            <h4>Current prices:</h4>
+            <p> Petrol: R{{ petrol_price }}</p>
+            <p> Diesel: R{{ diesel_price }}</p>
+        </div>
 
-    <p> Here's the petrol price: {{ petrol_price }}</p>
-    <p> Here's the diesel price: {{ diesel_price }}</p>
+        <div class="prompt-box">
+            <input type="text" id="userInput" placeholder="Ask me a question">
+            <button id="submit" onclick="send()">Send</button>
+        </div>
+
+
+    </div>
 
 {% endblock %}
