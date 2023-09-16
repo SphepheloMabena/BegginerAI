@@ -107,6 +107,16 @@ def scrape_historical_fuel_prices():
                 entry = dict(zip(header, cells))
                 year_data.append(entry)
 
+                        # Convert prices from cents to rands
+            # Convert prices from cents to rands for numeric values
+            for entry in year_data:
+                for key, value in entry.items():
+                    if key != "YR2012" and key != "" and value != "":
+                        try:
+                            entry[key] = f"{float(value) / 100:.2f}"  # Convert to rands with two decimal places
+                        except ValueError:
+                            pass  # Skip conversion for non-numeric values # Convert to rands with two decimal places
+
             # Filter out "COASTAL" and "GAUTENG" data
             filtered_data = [entry for entry in year_data if
                              entry.get(f"YR{year}") not in ("COASTAL", "") and
