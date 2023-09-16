@@ -33,8 +33,8 @@ def get_prices(fuel_type):
         table_body_element = job_element.find("tbody")
         table_row_element = table_body_element.find("tr")
         table_data_element = table_row_element.find_all("td")
-        litres = table_data_element[0].text
-        gallons = table_data_element[1].text
+        litres = float(table_data_element[0].text)
+        gallons = float(table_data_element[1].text)
 
     return litres, gallons
 
@@ -69,11 +69,53 @@ def calculate_litres_used(distance, fuel_consumption):
 def calculate_price(litres, price_per_litre):
     """Returns the price of fuel for a given number of litres"""
     return litres * price_per_litre
-def calculate_litres_used(distance, fuel_consumption):
-    """Returns the litres of fuel used for a given distance"""
-    return (distance / 100) * fuel_consumption
 
 
 def calculate_fuel_price(litres, price_per_litre):
     """Returns the price of fuel for a given number of litres"""
+    litres = float(litres)
     return litres * price_per_litre
+
+
+def get_car_info():
+    car_make = input("> Enter the make of your car: ")
+    car_year = input("> Enter the year of your car: ")
+    car_model = input("> Enter the model of your car: ")
+    return car_make, car_year, car_model
+
+
+def chat():
+    """Chat with the user"""
+    while True:
+        user_input = input("\nEnter your message: ")
+
+        if user_input == "quit":
+            break
+
+        if user_input == "price of petrol" or user_input == "price of diesel":
+
+            fuel_type = "petrol" if user_input == "price of petrol" else "diesel"
+            car_make, car_year, car_model = get_car_info()
+            car_data = get_car_models(car_make, car_year, car_model)
+            fuel_consumption = get_car_fuel_consumption(car_data)
+            litres, gallons = get_prices(fuel_type)
+
+            print(f"\nYour car has a fuel consumption rate of {fuel_consumption} liters per 100 kilometers on {fuel_type}, which translates to an estimated cost of R{litres} per liter.")
+
+       
+        elif user_input.lower() == "fuel price":
+            distance = int(input("> Enter the distance you will be traveling (km): "))
+            car_make, car_year, car_model = get_car_info()
+            car_data = get_car_models(car_make, car_year, car_model)
+            fuel_consumption = get_car_fuel_consumption(car_data)
+            fuel_type = input("> Does your car use diesel or petrol?: ").lower()
+            price_per_litre, gallons = get_prices(fuel_type)
+
+            litres_used = int(calculate_litres_used(distance, fuel_consumption))
+            fuel_price = int(calculate_fuel_price(litres_used, price_per_litre))
+
+            print(f"\nYou will use {litres_used} litres of fuel for your {distance}km trip, which will cost you around R{fuel_price}.")
+
+
+if __name__ == "__main__":
+    chat()
