@@ -78,25 +78,25 @@ WSGI_APPLICATION = 'beginneraichat.wsgi.application'
 
 
 '''Don't remove used in development'''
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 '''Don't remove used in production'''
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME':  'fuelchatbot',
-#         'USER': 'testuser',
-#         'PASSWORD': 'B3ginner@!2023', #env('DATABASE_PASSWORD'),
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME':  'chatdb', #env('DATABASE_NAME'),
+        'USER': 'chatadmin',
+        'PASSWORD': 'B3ginner@!2023', #env('DATABASE_PASSWORD'),
+        'HOST': '8.209.82.117',
+        'PORT': '5432',
+    }
+}
 
 
 # Password validation
