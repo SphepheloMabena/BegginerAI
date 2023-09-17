@@ -13,12 +13,16 @@ from chatbot.utils import get_prices
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 
 # Load environment variables from .env file
 env_path = Path('beginneraichat') / '.env'
 load_dotenv(dotenv_path=env_path)
 
 # Create your views here.
+stemmer = PorterStemmer()
 
 class HomeView(View, LoginRequiredMixin):
     petrol_price = FuelPrice.objects.filter(fuel_type='petrol').order_by('-date_added').first().litres_price
@@ -47,6 +51,32 @@ class HomeView(View, LoginRequiredMixin):
 
         # Process the response or set a default message
         bot_message = response.text if response.status_code == 200 else "Sorry, I couldn't process that."
+
+
+        wordsTokenized= word_tokenize(user_message)
+        stemmed_words = PorterStemmer()
+
+        string_for_stemming = user_message
+
+        words = word_tokenize(string_for_stemming)
+
+        
+    
+        stemmed_words = [stemmer.stem(word) for word in words]
+        print(f"Stemmed Words: {stemmed_words}")
+
+        for stem in stemmed_words:
+            if stem == "travel":
+                bot_message = "Please give us you start and final destination and also the car and model you will be using"
+            if stem == "go": 
+                bot_message == "Please give us you start and final destination and also the car and model you will be using"
+            if stem == "driving To":
+                bot_message = "Please give us you start and final destination and also the car and model you will be using"
+            if stem == "drive":
+                bot_message = "Please give us you start and final destination and also the car and model you will be using"
+
+
+
 
         chat = Chat(user_message=user_message, bot_message=bot_message)
         chat.save()
@@ -86,6 +116,7 @@ class ChatView(View):
         bot_message = get_response(user_message)
         chat = Chat(user_message=user_message, bot_message=bot_message)
         chat.save()
+        bot_message
         return render(request, 'index.html', {'user_message': user_message, 'bot_message': bot_message})
 
 
