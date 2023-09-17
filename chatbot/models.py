@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -15,3 +16,10 @@ class FuelPrice(models.Model):
 
     def __str__(self):
         return f"{self.fuel_type} - {self.litres_price} / {self.gallons_price}"
+
+
+class Chat(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    user_message = models.TextField()
+    bot_message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
