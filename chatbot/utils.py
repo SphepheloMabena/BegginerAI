@@ -4,6 +4,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import json
+import googlemaps
+from geopy.geocoders import Nominatim
+
+import geocoder
+
 
 # Load environment variables from .env file
 env_path = Path('beginneraichat') / '.env'
@@ -55,7 +60,11 @@ def get_car_models(make, year, model):
 
 def get_car_fuel_consumption(car_data):
     """Returns the fuel consumption of a car in litres per 100km"""
-    return car_data[0]["fuel_Consumtion_Combo"]
+    if car_data[0]["fuel_Consumtion_Combo"] > 0:
+        return car_data[0]["fuel_Consumtion_Combo"]
+    else:
+        return 7
+    
 
 
 def calculate_litres_used(distance, fuel_consumption):
@@ -127,6 +136,33 @@ def scrape_historical_fuel_prices():
     with open("fuel_prices.json", "w") as json_file:
         json.dump(fuel_data, json_file, indent=4)
 
+def calculateDistance(fromWhere, destinationn):
+ 
+    # Requires API key
+    gmaps = googlemaps.Client(key='AIzaSyDSnqPcx0ObekjzjZAwDJHjVDhj5M5KmSg')
+
+
+    
+    # Requires cities name
+    my_dist = gmaps.distance_matrix(fromWhere, destinationn)['rows'][0]['elements'][0]
+    
+    # Printing the result
+    distance = my_dist["distance"]["value"]
+
+    return distance
+
+
+def get_current_location():
+    # Using the 'ipinfo' provider to get location based on your IP address
+    location = geocoder.ipinfo('me')
+    return location.latlng  # Returns a tuple of latitude and longitude
+
+
 
 if __name__ == "__main__":
+    calculateDistance("Pretoria", "Benoni")
+    current_location = get_current_location()
+    print(f"Latitude: {current_location[0]}, Longitude: {current_location[1]}")
+    geolocator = Nominatim(user_agent="myGeocoder")
+    location = geolocator.reverse((current_location[0], current_location[1]))
     scrape_historical_fuel_prices()
