@@ -68,7 +68,6 @@ def get_car_fuel_consumption(car_data):
         return 7
     
 
-
 def calculate_litres_used(distance, fuel_consumption):
     """Returns the litres of fuel used for a given distance"""
     return (distance / 100) * fuel_consumption
