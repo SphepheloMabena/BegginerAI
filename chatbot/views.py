@@ -1,3 +1,4 @@
+import requests
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,9 +30,20 @@ class HomeView(View, LoginRequiredMixin):
 
     def post(self, request, *args, **kwargs):
         user_message = request.POST.get('user_message')
-        bot_message = get_response(user_message)
+
+        # Prepare the request to the external service
+        url = "http://5827294430427910.eu-central-1.pai-eas.aliyuncs.com/api/predict/chatbot_service"
+        headers = {
+            "Authorization": "env(API_KEY)" #TODO:
+        }
+        response = requests.post(url, headers=headers, data=user_message.encode('utf-8'))
+
+        # Process the response or set a default message
+        bot_message = response.text if response.status_code == 200 else "Sorry, I couldn't process that."
+
         chat = Chat(user_message=user_message, bot_message=bot_message)
         chat.save()
+
         context = {
             'user_message': user_message,
             'bot_message': bot_message,
