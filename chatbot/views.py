@@ -39,63 +39,91 @@ class HomeView(View, LoginRequiredMixin):
             'chat_history': self.get_chat_history()
         }
         return render(request, 'index.html', context)
+    
 
     def post(self, request, *args, **kwargs):
         user_message = request.POST.get('user_message')
+        valid_greetings = ['hi', 'hello', 'hey', 'howdy', 'hola', 'bonjour', 'oi', 'greetings', 'sup']
 
         # Prepare the request to the external service
         url = "http://5827294430427910.eu-central-1.pai-eas.aliyuncs.com/api/predict/chatbot_service"
         headers = {
             "Authorization": os.getenv("EAS-KEY")
         }
+
         response = requests.post(url, headers=headers, data=user_message.encode('utf-8'))
 
-        # Process the response or set a default message
-        bot_message = response.text if response.status_code == 200 else "Sorry, I couldn't process that."
+        def contains_keywords(sentence):
+            keywords = ['travel', 'go', 'drive', 'driving', 'petrol', 'diesel', 'price', 'cost', 'distance', 'litres', 'gallons', 'km', 'kilometres', 'kilometers', 'litre']
+            # Convert the sentence to lowercase to make it case-insensitive
+            sentence = sentence.lower()
+            
+            # Check if any of the keywords is in the sentence
+            for keyword in keywords:
+                if keyword.lower() in sentence:
+                    return True
+                
+            return False
+       
+
+        if contains_keywords(user_message):
+
+            wordsTokenized= word_tokenize(user_message)
+            stemmed_words = PorterStemmer()
+
+            string_for_stemming = user_message
+
+            words = word_tokenize(string_for_stemming)
 
 
-        wordsTokenized= word_tokenize(user_message)
-        stemmed_words = PorterStemmer()
+            stemmed_words = [stemmer.stem(word) for word in words]
+            print(f"Stemmed Words: {stemmed_words}")
+            fuel_price = get_prices('petrol')
 
-        string_for_stemming = user_message
+            for stem in stemmed_words:
+                if stem == "travel":
+                    bot_message = "Please give us you start and final destination and also the car and model you will be using"
+                if stem == "go": 
+                    bot_message = "Please give us you start and final destination and also the car and model you will be using"
+                if stem == "driving To":
+                    bot_message = "Please give us you start and final destination and also the car and model you will be using"
+                if stem == "drive":
+                    bot_message = "Please give us you start and final destination and also the car and model you will be using"
 
-        words = word_tokenize(string_for_stemming)
+                if stem == "petrol":
+                    bot_message = f"The current price of petrol is R{fuel_price}"
 
+            fuel_price = get_prices('petrol')[0]
 
-        stemmed_words = [stemmer.stem(word) for word in words]
-        print(f"Stemmed Words: {stemmed_words}")
-        fuel_price = get_prices('petrol')
+            get_distnce = calculateDistance("BCX Centurion", "Mall of Africa")
+            calculatedDistance = int(get_distnce)/1000
+            full_tank = int(fuel_price * calculatedDistance)
 
-        for stem in stemmed_words:
-            if stem == "travel":
-                bot_message = "Please give us you start and final destination and also the car and model you will be using"
-            if stem == "go": 
-                bot_message = "Please give us you start and final destination and also the car and model you will be using"
-            if stem == "driving To":
-                bot_message = "Please give us you start and final destination and also the car and model you will be using"
-            if stem == "drive":
-                bot_message = "Please give us you start and final destination and also the car and model you will be using"
+            message = (f"The distance between BCX Centurion and Mall of Africa is {calculatedDistance}km and the price of "
+                        f"petrol is R{fuel_price} per litre. It will cost you R{full_tank} to travel from BCX Centurion "
+                        f"to Mall of Africa")
 
-            if stem == "petrol":
-                bot_message = f"The current price of petrol is R{fuel_price}"
+            chat = Chat(user_message=user_message, bot_message=message)
+            chat.save()
 
-        fuel_price = get_prices('petrol')
+            context = {
+                'user_message': user_message,
+                'bot_message': message,
+                'chat_history': self.get_chat_history()
+            }
+        
+        else:
+            message = response.text if response.status_code == 200 else "Sorry, I couldn't process that."
 
-        get_distnce = calculateDistance("BCX Centurion", "Mall of Africa")
-        full_tank = fuel_price * get_distnce
+            chat = Chat(user_message=user_message, bot_message=message)
+            chat.save()
 
-        bot_message = (f"The distance between BCX Centurion and Mall of Africa is {get_distnce}km and the price of "
-                       f"petrol is R{fuel_price} per litre. It will cost you R{full_tank} to travel from BCX Centurion "
-                       f"to Mall of Africa")
+            context = {
+                'user_message': user_message,
+                'bot_message': message,
+                'chat_history': self.get_chat_history()
+            }
 
-        chat = Chat(user_message=user_message, bot_message=bot_message)
-        chat.save()
-
-        context = {
-            'user_message': user_message,
-            'bot_message': bot_message,
-            'chat_history': self.get_chat_history()
-        }
         return render(request, 'index.html', context)
 
 
