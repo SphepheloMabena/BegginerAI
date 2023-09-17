@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
+import nltk
 
 # Load environment variables from .env file
 env_path = Path('beginneraichat') / '.env'
