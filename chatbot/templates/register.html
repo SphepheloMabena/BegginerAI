@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="home-body glassmorphism">
+<!-- <div class="home-body glassmorphism">
     <h2>Register</h2>
     <form method="post">
         {% csrf_token %}
@@ -9,6 +9,27 @@
         <button type="submit">Register</button>
     </form>
     <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</div> -->
+<div class="home-body">
+<div class="box">
+    <h2>Register</h2>
+    <form action="">
+        <div class="inputBox">
+            <input type="text" name="" required="">
+            <label for="">Username</label>
+        </div>
+        <div class="inputBox">
+            <input type="password" name="" required="">
+            <label for="">Password</label>
+        </div>
+        <div class="inputBox">
+            <input type="password" name="" required="">
+            <label for="">Confirm Password</label>
+        </div>
+        <input type="submit" name="" value="Submit">
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</div>
 </div>
 {% endblock %}
 
