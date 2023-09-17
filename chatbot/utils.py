@@ -21,7 +21,6 @@ def get_prices(fuel_type):
     else:
         PRICES_PAGE = requests.get(diesel_prices_url)
 
-
     soup = BeautifulSoup(PRICES_PAGE.content, "html.parser")
     results = soup.find(id="graphPageLeft")
 
@@ -42,7 +41,7 @@ def get_car_models(make, year, model):
 
     url = "https://cars-fuel-consumption.p.rapidapi.com/v1/Car/GetModel"
 
-    querystring = {"make":make,"year":year,"model":model}
+    querystring = {"make": make, "year": year, "model": model}
 
     headers = {
         "X-RapidAPI-Key": os.getenv("X-RapidAPI-Key"),
@@ -55,7 +54,7 @@ def get_car_models(make, year, model):
 
 
 def get_car_fuel_consumption(car_data):
-    """Returns the fuel consumption of a car in litres per 100km"""	
+    """Returns the fuel consumption of a car in litres per 100km"""
     return car_data[0]["fuel_Consumtion_Combo"]
 
 
@@ -83,12 +82,12 @@ def get_car_info():
 
 
 def scrape_historical_fuel_prices():
-    """Scrapes historical fuel prices from the sapia website"""	
+    """Scrapes historical fuel prices from the sapia website"""
 
     base_url = "https://www.sapia.org.za/old-fuel-prices/"
     years = list(range(2012, 2023))  # Years from 2012 to 2022
-    
-    fuel_data = {} 
+
+    fuel_data = {}
 
     for year in years:
         url = f"{base_url}#tablepress-{year}"
@@ -107,7 +106,7 @@ def scrape_historical_fuel_prices():
                 entry = dict(zip(header, cells))
                 year_data.append(entry)
 
-                        # Convert prices from cents to rands
+                # Convert prices from cents to rands
             # Convert prices from cents to rands for numeric values
             for entry in year_data:
                 for key, value in entry.items():
@@ -121,13 +120,34 @@ def scrape_historical_fuel_prices():
             filtered_data = [entry for entry in year_data if
                              entry.get(f"YR{year}") not in ("COASTAL", "") and
                              entry.get(f"YR{year}") not in ("GAUTENG", "")]
-            
+
             fuel_data[str(year)] = filtered_data
-    
+
     # Save the data to a JSON file
     with open("fuel_prices.json", "w") as json_file:
-        json.dump(fuel_data, json_file, indent=4)    
-    
+        json.dump(fuel_data, json_file, indent=4)
+
+
+def get_response(user_input):
+
+    if "price of petrol" in user_input.lower() or "price of diesel" in user_input.lower():
+        fuel_type = "petrol" if "price of petrol" in user_input.lower() else "diesel"
+        litres, gallons = get_prices(fuel_type)
+        return f"The current price of {fuel_type} is R{litres} per liter."
+    elif "fuel price" in user_input.lower():
+        # Placeholder values
+        distance = 100
+        car_make, car_year, car_model = "Toyota", "2020", "Corolla"
+        car_data = get_car_models(car_make, car_year, car_model)
+        fuel_consumption = get_car_fuel_consumption(car_data)
+        fuel_type = "petrol"
+        price_per_litre, gallons = get_prices(fuel_type)
+        litres_used = calculate_litres_used(distance, fuel_consumption)
+        fuel_price = calculate_fuel_price(litres_used, price_per_litre)
+        return f"For a distance of {distance}km, you'll use approximately {litres_used} liters of {fuel_type} costing around R{fuel_price}."
+    else:
+        return "I'm sorry, I don't understand that command."
+
 
 def chat():
     """Chat with the user"""
@@ -145,9 +165,10 @@ def chat():
             fuel_consumption = get_car_fuel_consumption(car_data)
             litres, gallons = get_prices(fuel_type)
 
-            print(f"\nYour car has a fuel consumption rate of {fuel_consumption} liters per 100 kilometers on {fuel_type}, which translates to an estimated cost of R{litres} per liter.")
+            print(
+                f"\nYour car has a fuel consumption rate of {fuel_consumption} liters per 100 kilometers on {fuel_type}, which translates to an estimated cost of R{litres} per liter.")
 
-       
+
         elif user_input.lower() == "fuel price":
             distance = int(input("> Enter the distance you will be traveling (km): "))
             car_make, car_year, car_model = get_car_info()
@@ -159,7 +180,8 @@ def chat():
             litres_used = int(calculate_litres_used(distance, fuel_consumption))
             fuel_price = int(calculate_fuel_price(litres_used, price_per_litre))
 
-            print(f"\nYou will use {litres_used} litres of fuel for your {distance}km trip, which will cost you around R{fuel_price}.")
+            print(
+                f"\nYou will use {litres_used} litres of fuel for your {distance}km trip, which will cost you around R{fuel_price}.")
 
 
 if __name__ == "__main__":

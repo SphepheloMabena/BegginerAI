@@ -5,17 +5,47 @@
         <div class="greeting-card">
             <h1 class="heading">FuelWise</h1>
 
-            <h4>Current prices:</h4>
-            <p> Petrol: R{{ petrol_price }}</p>
-            <p> Diesel: R{{ diesel_price }}</p>
+{#            <h4>Current prices:</h4>#}
+{#            <p> Petrol: R{{ petrol_price }}</p>#}
+{#            <p> Diesel: R{{ diesel_price }}</p>#}
+        </div>
+
+        <div class="chat-container glassmorphism">
+            {% for chat in chat_history %}
+                <div class="clearfix">
+                    <div class="message-container">
+                        <div class="chat-bubble user-bubble glassmorphism">
+                            <span class="name-label">You</span>
+                            {{ chat.user_message }}
+                        </div>
+                    </div>
+                    <div class="message-container">
+                        <div class="chat-bubble bot-bubble glassmorphism">
+                            <span class="name-label">FuelWise Bot</span>
+                            {{ chat.bot_message }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
 
         <div class="prompt-box">
-            <input type="text" id="userInput" placeholder="Ask me a question">
-            <button id="submit" onclick="send()">Send</button>
+            <form method="post" id="chatForm">
+                {% csrf_token %}
+                <input type="text" id="userInput" name="user_message" placeholder="Ask me a question">
+                <button type="submit" id="submit">Send</button>
+            </form>
         </div>
 
 
     </div>
+
+    <script>
+        document.getElementById('chatForm').addEventListener('submit', function() {
+            var submitButton = document.getElementById('submit');
+            submitButton.disabled = true;
+            submitButton.innerText = 'Submitting...';
+        });
+    </script>
 
 {% endblock %}

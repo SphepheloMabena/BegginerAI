@@ -69,3 +69,84 @@ body {
     background-color: #4b27db;
     transform: scale(1.1);
 }
+
+/* Glassmorphism Styles */
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: all 0.2s ease-in-out;
+}
+
+.glassmorphism:hover {
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chat-container {
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    max-height: calc(60vh - 180px); /* Adjust as needed */
+    overflow-y: auto;
+    padding: 20px 20px 80px;
+    background-color: transparent;
+}
+
+.chat-bubble {
+
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 20px;
+    display: inline-block;
+    max-width: 80%;
+    position: relative;
+    background-color: transparent; /* Remove the solid background */
+}
+
+.user-bubble {
+    float: right;
+    margin-left: 10px;
+    text-align: left;
+}
+
+.bot-bubble {
+    float: left;
+    margin-right: 10px;
+    text-align: right;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.name-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.user-bubble .name-label {
+    text-align: right;
+    margin-left: 10px;
+}
+
+.bot-bubble .name-label {
+    text-align: left;
+    margin-right: 10px;
+}
+
+.message-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* Default alignment */
+    margin-bottom: 10px;
+}
+
+.message-container .bot-bubble {
+    margin-left: auto; /* Push the bot bubble to the right */
+}
