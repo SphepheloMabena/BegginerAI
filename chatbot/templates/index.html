@@ -2,27 +2,27 @@
 
 {% block content %}
     <div class="home-body">
-        <div class="greeting-card">
+        <nav class="nav">
             <h1 class="heading">FuelWise</h1>
 
 {#            <h4>Current prices:</h4>#}
 {#            <p> Petrol: R{{ petrol_price }}</p>#}
 {#            <p> Diesel: R{{ diesel_price }}</p>#}
-        </div>
+        </nav>
 
         <div class="chat-container glassmorphism">
             {% for chat in chat_history %}
                 <div class="clearfix">
                     <div class="message-container">
                         <div class="chat-bubble user-bubble glassmorphism">
-                            <span class="name-label">You</span>
-                            {{ chat.user_message }}
+                            <h4 class="name-label">You</h4>
+                            <p>{{ chat.user_message }}</p>
                         </div>
                     </div>
                     <div class="message-container">
                         <div class="chat-bubble bot-bubble glassmorphism">
-                            <span class="name-label">FuelWise Bot</span>
-                            {{ chat.bot_message }}
+                            <h4 class="name-label">FuelWise Bot</h4>
+                            <p>{{ chat.bot_message }}</p>
                         </div>
                     </div>
                 </div>

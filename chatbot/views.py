@@ -8,8 +8,15 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from chatbot.models import FuelPrice, Chat
-from chatbot.utils import get_prices, get_response
+from chatbot.utils import get_prices
 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+env_path = Path('beginneraichat') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 # Create your views here.
 
@@ -34,7 +41,7 @@ class HomeView(View, LoginRequiredMixin):
         # Prepare the request to the external service
         url = "http://5827294430427910.eu-central-1.pai-eas.aliyuncs.com/api/predict/chatbot_service"
         headers = {
-            "Authorization": "env(API_KEY)" #TODO:
+            "Authorization": os.getenv("EAS-KEY")
         }
         response = requests.post(url, headers=headers, data=user_message.encode('utf-8'))
 
