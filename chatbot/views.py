@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from chatbot.models import FuelPrice, Chat
-from chatbot.utils import get_prices
+from chatbot.utils import get_prices, calculateDistance
 
 import os
 from pathlib import Path
@@ -61,23 +61,32 @@ class HomeView(View, LoginRequiredMixin):
 
         words = word_tokenize(string_for_stemming)
 
-        
-    
+
         stemmed_words = [stemmer.stem(word) for word in words]
         print(f"Stemmed Words: {stemmed_words}")
+        fuel_price = get_prices('petrol')
 
         for stem in stemmed_words:
             if stem == "travel":
                 bot_message = "Please give us you start and final destination and also the car and model you will be using"
             if stem == "go": 
-                bot_message == "Please give us you start and final destination and also the car and model you will be using"
+                bot_message = "Please give us you start and final destination and also the car and model you will be using"
             if stem == "driving To":
                 bot_message = "Please give us you start and final destination and also the car and model you will be using"
             if stem == "drive":
                 bot_message = "Please give us you start and final destination and also the car and model you will be using"
 
+            if stem == "petrol":
+                bot_message = f"The current price of petrol is R{fuel_price}"
 
+        fuel_price = get_prices('petrol')
 
+        get_distnce = calculateDistance("BCX Centurion", "Mall of Africa")
+        full_tank = fuel_price * get_distnce
+
+        bot_message = (f"The distance between BCX Centurion and Mall of Africa is {get_distnce}km and the price of "
+                       f"petrol is R{fuel_price} per litre. It will cost you R{full_tank} to travel from BCX Centurion "
+                       f"to Mall of Africa")
 
         chat = Chat(user_message=user_message, bot_message=bot_message)
         chat.save()
