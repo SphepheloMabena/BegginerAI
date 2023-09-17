@@ -6,8 +6,10 @@ from dotenv import load_dotenv
 import json
 import googlemaps
 from geopy.geocoders import Nominatim
-
 import geocoder
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+import psycopg2 
 
 
 # Load environment variables from .env file
@@ -156,6 +158,70 @@ def get_current_location():
     # Using the 'ipinfo' provider to get location based on your IP address
     location = geocoder.ipinfo('me')
     return location.latlng  # Returns a tuple of latitude and longitude
+
+
+def predict_fuel_prices(year, month):
+    """Predicts the fuel prices for a given year and month"""
+
+    # Calculate the month as a fraction of the year (e.g., January is 1/12)
+    month_fraction = month / 12.0
+
+    conn = psycopg2.connect(
+        database="chatdb",
+        user="chatadmin",
+        password="B3ginner@!2023",
+        host="8.209.82.117",
+        port="5432"
+    )
+    
+    cursor = conn.cursor()
+    
+    # Define the list of relevant fuel types (petrol and diesel)
+    relevant_fuel_types = ['93 LRP (c/l)', '93 ULP (c/l)', '95 LRP (c/l)', '95 ULP (c/l)',
+                           'Diesel 0.005% (c/l)', 'Diesel 0.05% (c/l)']
+    
+    # Fetch historical fuel price data for relevant fuel types
+    cursor.execute("SELECT fuel_type, year, month, price FROM historical_fuel_price_history WHERE fuel_type IN %s ORDER BY fuel_type, year, month", (tuple(relevant_fuel_types),))
+    
+    # Fetch all records from the query result
+    records = cursor.fetchall()
+    
+    # Close the database connection
+    conn.close()
+    
+    # Extract fuel types, years, months, and prices from the records
+    fuel_types = np.array([record[0] for record in records])
+    years = np.array([int(record[1]) for record in records])
+    months = np.array([record[2].month for record in records])
+    prices = np.array([float(record[3]) for record in records])
+    
+    # Calculate the month as a fraction of the year for each record
+    month_fraction = months / 12.0
+    
+    # Create an input array for the regression model
+    X = years + month_fraction
+    
+    estimated_prices = {}
+    
+    # Iterate over unique fuel types and estimate prices for each
+    unique_fuel_types = np.unique(fuel_types)
+    for fuel_type in unique_fuel_types:
+        # Filter data for the current fuel type
+        fuel_type_indices = np.where(fuel_types == fuel_type)
+        X_fuel_type = X[fuel_type_indices].reshape(-1, 1)
+        prices_fuel_type = prices[fuel_type_indices]
+        
+        # Create a Random Forest Regression model for the current fuel type
+        model = RandomForestRegressor(n_estimators=100, random_state=0)
+        model.fit(X_fuel_type, prices_fuel_type)
+        
+        # Predict the fuel price for the given year and month for the current fuel type
+        prediction = model.predict([[year + month / 12.0]])
+        
+        # Store the estimated price for the current fuel type
+        estimated_prices[fuel_type] = prediction[0]
+
+    return estimated_prices
 
 
 
